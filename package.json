@@ -1,0 +1,250 @@
+{
+  "name": "model-browser",
+  "displayName": "Model Browser",
+  "description": "View 3D models in VS Code: glTF, OBJ and Source 2 (DMX, VMDL, compiled VMDL_C), with a sidebar listing every model in the workspace.",
+  "version": "0.1.0",
+  "publisher": "model-browser",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "3d",
+    "model",
+    "viewer",
+    "gltf",
+    "glb",
+    "obj",
+    "dmx",
+    "vmdl",
+    "source 2",
+    "valve"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "modelBrowser.viewer",
+        "displayName": "Model Browser",
+        "selector": [
+          {
+            "filenamePattern": "*.glb"
+          },
+          {
+            "filenamePattern": "*.dmx"
+          },
+          {
+            "filenamePattern": "*.vmdl_c"
+          }
+        ],
+        "priority": "default"
+      },
+      {
+        "viewType": "modelBrowser.viewerText",
+        "displayName": "Model Browser",
+        "selector": [
+          {
+            "filenamePattern": "*.gltf"
+          },
+          {
+            "filenamePattern": "*.obj"
+          },
+          {
+            "filenamePattern": "*.vmdl"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "modelBrowser",
+          "title": "Model Browser",
+          "icon": "media/activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "modelBrowser": [
+        {
+          "id": "modelBrowser.files",
+          "name": "Models",
+          "icon": "media/activity.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "modelBrowser.open",
+        "title": "Open in Model Browser",
+        "category": "Model Browser",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "modelBrowser.openToSide",
+        "title": "Open to the Side",
+        "category": "Model Browser"
+      },
+      {
+        "command": "modelBrowser.refresh",
+        "title": "Refresh",
+        "category": "Model Browser",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "modelBrowser.filter",
+        "title": "Filter…",
+        "category": "Model Browser",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "modelBrowser.clearFilter",
+        "title": "Clear Filter",
+        "category": "Model Browser",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "modelBrowser.revealInExplorer",
+        "title": "Reveal in Explorer",
+        "category": "Model Browser"
+      },
+      {
+        "command": "modelBrowser.clearCache",
+        "title": "Clear Conversion Cache",
+        "category": "Model Browser"
+      },
+      {
+        "command": "modelBrowser.preview",
+        "title": "Preview Model",
+        "category": "Model Browser"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "modelBrowser.filter",
+          "when": "view == modelBrowser.files",
+          "group": "navigation@1"
+        },
+        {
+          "command": "modelBrowser.clearFilter",
+          "when": "view == modelBrowser.files && modelBrowser.filtered",
+          "group": "navigation@2"
+        },
+        {
+          "command": "modelBrowser.refresh",
+          "when": "view == modelBrowser.files",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "modelBrowser.openToSide",
+          "when": "view == modelBrowser.files && viewItem == model",
+          "group": "navigation@1"
+        },
+        {
+          "command": "modelBrowser.revealInExplorer",
+          "when": "view == modelBrowser.files && viewItem == model",
+          "group": "navigation@2"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "modelBrowser.open",
+          "when": "resourceExtname in modelBrowser.extensions",
+          "group": "navigation@20"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "modelBrowser.open",
+          "when": "resourceExtname in modelBrowser.extensions && activeEditor == workbench.editors.files.textFileEditor",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "modelBrowser.openToSide",
+          "when": "false"
+        },
+        {
+          "command": "modelBrowser.revealInExplorer",
+          "when": "false"
+        },
+        {
+          "command": "modelBrowser.preview",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Model Browser",
+      "properties": {
+        "modelBrowser.s2vPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Path to the **Source 2 Viewer CLI** (`Source2Viewer-CLI`), used to view compiled `.vmdl_c` models. Download it from the [ValveResourceFormat releases](https://github.com/ValveResourceFormat/ValveResourceFormat/releases). Relative paths are resolved against the workspace folder."
+        },
+        "modelBrowser.gameInfo": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Optional path to a game's `gameinfo.gi` (e.g. `…/Deadlock/game/citadel/gameinfo.gi`). Lets the Source 2 Viewer CLI find materials and textures in the game's VPKs when converting `.vmdl_c`."
+        },
+        "modelBrowser.contentRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Extra folders that Source 2 content paths (e.g. `models/props/foo.dmx` inside a `.vmdl`) are resolved against. The folders above the `.vmdl` are always tried first."
+        },
+        "modelBrowser.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**"
+          ],
+          "markdownDescription": "Glob patterns left out of the **Models** sidebar."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "sweep": "node esbuild.mjs --scripts && node out/sweep.js",
+    "preview": "node esbuild.mjs --scripts && node out/preview.js",
+    "check-manifest": "node esbuild.mjs --scripts && node out/check-manifest.js",
+    "package": "npm run build && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/three": "^0.187.0",
+    "@types/vscode": "1.90",
+    "@vscode/vsce": "^4.1.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  }
+}
