@@ -2,7 +2,7 @@ import { rm } from 'node:fs/promises';
 import * as vscode from 'vscode';
 import { ModelTree, openModel } from './browser/ModelTree';
 import { allExtensions } from './loaders/registry';
-import { ModelEditorProvider, VIEW_TYPE, VIEW_TYPE_TEXT, viewTypeFor } from './editor/ModelEditorProvider';
+import { ModelEditorProvider, VIEW_TYPE } from './editor/ModelEditorProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   const output = vscode.window.createOutputChannel('Model Browser');
@@ -17,14 +17,13 @@ export function activate(context: vscode.ExtensionContext) {
     output,
     view,
     vscode.window.registerCustomEditorProvider(VIEW_TYPE, provider, editorOptions),
-    vscode.window.registerCustomEditorProvider(VIEW_TYPE_TEXT, provider, editorOptions),
     vscode.commands.registerCommand('modelBrowser.open', (uri?: vscode.Uri) => {
       uri ??= vscode.window.activeTextEditor?.document.uri;
       if (uri) return openModel(uri, false);
     }),
     vscode.commands.registerCommand('modelBrowser.preview', (uri: vscode.Uri) => openModel(uri, true)),
     vscode.commands.registerCommand('modelBrowser.openToSide', (uri?: vscode.Uri) => {
-      if (uri) return vscode.commands.executeCommand('vscode.openWith', uri, viewTypeFor(uri.fsPath), vscode.ViewColumn.Beside);
+      if (uri) return vscode.commands.executeCommand('vscode.openWith', uri, VIEW_TYPE, vscode.ViewColumn.Beside);
     }),
     vscode.commands.registerCommand('modelBrowser.refresh', () => tree.refresh()),
     vscode.commands.registerCommand('modelBrowser.filter', async () => {

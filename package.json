@@ -2,7 +2,7 @@
   "name": "model-browser",
   "displayName": "Model Browser",
   "description": "View 3D models in VS Code: glTF, OBJ and Source 2 (DMX, VMDL, compiled VMDL_C), with a sidebar listing every model in the workspace.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "isaiahsimeone",
   "license": "MIT",
   "repository": {
@@ -46,29 +46,22 @@
             "filenamePattern": "*.glb"
           },
           {
-            "filenamePattern": "*.dmx"
-          },
-          {
-            "filenamePattern": "*.vmdl_c"
-          }
-        ],
-        "priority": "default"
-      },
-      {
-        "viewType": "modelBrowser.viewerText",
-        "displayName": "Model Browser",
-        "selector": [
-          {
             "filenamePattern": "*.gltf"
           },
           {
             "filenamePattern": "*.obj"
           },
           {
+            "filenamePattern": "*.dmx"
+          },
+          {
             "filenamePattern": "*.vmdl"
+          },
+          {
+            "filenamePattern": "*.vmdl_c"
           }
         ],
-        "priority": "option"
+        "priority": "default"
       }
     ],
     "viewsContainers": {

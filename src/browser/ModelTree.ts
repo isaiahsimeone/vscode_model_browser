@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { allExtensions, loaderFor } from '../loaders/registry';
 import { excludeGlobs } from '../settings';
-import { viewTypeFor } from '../editor/ModelEditorProvider';
+import { VIEW_TYPE } from '../editor/ModelEditorProvider';
 
 interface FolderNode {
   kind: 'folder';
@@ -155,5 +155,5 @@ export class ModelTree implements vscode.TreeDataProvider<Node> {
 }
 
 export function openModel(uri: vscode.Uri, preview = true) {
-  return vscode.commands.executeCommand('vscode.openWith', uri, viewTypeFor(uri.fsPath), { preview, preserveFocus: preview });
+  return vscode.commands.executeCommand('vscode.openWith', uri, VIEW_TYPE, { preview, preserveFocus: preview });
 }

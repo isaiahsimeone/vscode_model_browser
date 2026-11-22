@@ -5,12 +5,8 @@ import type { ModelData } from '../loaders/types';
 import { MissingToolError } from '../loaders/vmdlc';
 import { loaderSettings } from '../settings';
 
-/** Binary formats open in the viewer by default; text formats (.obj, .gltf, .vmdl) keep the text editor as the
- *  default and offer the viewer through "Open in Model Browser" / "Reopen Editor With…". */
+/** Every model format opens in the viewer by default; the toolbar's Text button reopens a file as text. */
 export const VIEW_TYPE = 'modelBrowser.viewer';
-export const VIEW_TYPE_TEXT = 'modelBrowser.viewerText';
-const TEXT_FORMATS = ['.gltf', '.obj', '.vmdl'];
-export const viewTypeFor = (file: string) => (TEXT_FORMATS.some((e) => file.toLowerCase().endsWith(e)) ? VIEW_TYPE_TEXT : VIEW_TYPE);
 
 /** Messages sent to the webview. */
 export type ToWebview =

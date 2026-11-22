@@ -11,15 +11,15 @@ Built for Source 2 modding, where the usual VS Code model viewers stop at glTF a
    Or from a terminal: `code --install-extension model-browser-<version>.vsix`
 3. To view compiled `.vmdl_c` models, also set `modelBrowser.s2vPath` (see [Settings](#settings)).
 
-| Format | Extension | How it's read | Opens by default |
-|---|---|---|---|
-| glTF | `.glb`, `.gltf` | three.js. External textures and buffers next to the file are inlined | `.glb` yes, `.gltf` via *Open in Model Browser* |
-| Wavefront OBJ | `.obj` (+ `.mtl`) | three.js | via *Open in Model Browser* |
-| Valve DMX | `.dmx` | Built-in reader for **binary (v1–9)** and **keyvalues2** encodings: meshes, materials, skeleton | yes |
-| Source 2 model source | `.vmdl` | KV3 parser; loads every `RenderMeshFile` (`.dmx`) and merges them. Higher LODs and non-default body groups start hidden | via *Open in Model Browser* |
-| Source 2 compiled model | `.vmdl_c` | Converted to glTF by [Source 2 Viewer CLI](https://github.com/ValveResourceFormat/ValveResourceFormat) (textures, skeleton, animations), cached | yes |
+| Format | Extension | How it's read |
+|---|---|---|
+| glTF | `.glb`, `.gltf` | three.js. External textures and buffers next to the file are inlined |
+| Wavefront OBJ | `.obj` (+ `.mtl`) | three.js |
+| Valve DMX | `.dmx` | Built-in reader for **binary (v1–9)** and **keyvalues2** encodings: meshes, materials, skeleton |
+| Source 2 model source | `.vmdl` | KV3 parser; loads every `RenderMeshFile` (`.dmx`) and merges them. Higher LODs and non-default body groups start hidden |
+| Source 2 compiled model | `.vmdl_c` | Converted to glTF by [Source 2 Viewer CLI](https://github.com/ValveResourceFormat/ValveResourceFormat) (textures, skeleton, animations), cached |
 
-Text formats (`.gltf`, `.obj`, `.vmdl`) keep the text editor as their default. Use the eye button in the editor title, *Open in Model Browser* in the explorer's right-click menu, or *Reopen Editor With…*.
+Every format opens in the viewer. To edit a text format (`.vmdl`, `.obj`, `.gltf`, text `.dmx`), click **Text** in the viewer toolbar; the eye button in the text editor's title bar switches back.
 
 ## The viewer
 
