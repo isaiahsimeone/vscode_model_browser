@@ -4,6 +4,14 @@ View 3D models inside VS Code. Open a model file and it shows up in a 3D viewer 
 
 Built for Source 2 modding, where the usual VS Code model viewers stop at glTF and OBJ.
 
+![A binary DMX model with its skeleton](docs/images/dmx.png)
+*Binary `.dmx`: 97k-triangle mesh with its 65-bone skeleton, per-material colours and stats.*
+
+| | |
+|---|---|
+| ![A textured glTF model](docs/images/glb.png) | ![A compiled Source 2 model with skeleton](docs/images/vmdl_c.png) |
+| Textured `.glb` (external texture inlined automatically) | Compiled `.vmdl_c` via Source 2 Viewer CLI: bones, animations, part toggles |
+
 ## Install
 
 1. Download `model-browser-<version>.vsix` from the [latest release](https://github.com/isaiahsimeone/vscode_model_browser/releases/latest).
