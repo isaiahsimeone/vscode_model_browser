@@ -4,6 +4,13 @@ View 3D models inside VS Code. Open a model file and it shows up in a 3D viewer 
 
 Built for Source 2 modding, where the usual VS Code model viewers stop at glTF and OBJ.
 
+## Install
+
+1. Download `model-browser-<version>.vsix` from the [latest release](https://github.com/isaiahsimeone/vscode_model_browser/releases/latest).
+2. In VS Code, open the Extensions view, click **…** → **Install from VSIX…**, and pick the file.
+   Or from a terminal: `code --install-extension model-browser-<version>.vsix`
+3. To view compiled `.vmdl_c` models, also set `modelBrowser.s2vPath` (see [Settings](#settings)).
+
 | Format | Extension | How it's read | Opens by default |
 |---|---|---|---|
 | glTF | `.glb`, `.gltf` | three.js. External textures and buffers next to the file are inlined | `.glb` yes, `.gltf` via *Open in Model Browser* |
@@ -75,6 +82,12 @@ npm run package        # builds model-browser-<version>.vsix
 ```
 
 Install a build with `code --install-extension model-browser-0.1.0.vsix`, or press F5 in VS Code to launch an Extension Development Host.
+
+### Releasing
+
+1. Bump `version` in `package.json` (and add a `CHANGELOG.md` entry), then commit.
+2. Tag and push: `git tag v0.2.0 && git push origin main v0.2.0`.
+3. The **Release** workflow builds, tests and publishes a GitHub Release with the `.vsix` attached. It fails if the tag doesn't match `package.json`.
 
 ### Layout
 
