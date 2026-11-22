@@ -4,11 +4,12 @@ import { objLoader } from './obj';
 import { dmxLoader } from './dmx';
 import { vmdlLoader } from './vmdl';
 import { vmdlcLoader } from './vmdlc';
+import { stlLoader } from './stl';
 import type { LoadContext, ModelData, ModelLoader } from './types';
 
 /** Every format the extension understands. To add one: write a ModelLoader, add it here, and add its
  *  extensions to package.json (`npm run check-manifest` verifies the two agree). */
-export const loaders: ModelLoader[] = [gltfLoader, objLoader, dmxLoader, vmdlLoader, vmdlcLoader];
+export const loaders: ModelLoader[] = [gltfLoader, objLoader, dmxLoader, vmdlLoader, vmdlcLoader, stlLoader];
 
 export const allExtensions = (): string[] => loaders.flatMap((l) => l.extensions);
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- STL support (binary and ASCII).
+
 ## 0.1.1
 
 - `.vmdl`, `.obj` and `.gltf` now open in the viewer by default too (use **Text** in the toolbar to edit them).

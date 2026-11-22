@@ -1,4 +1,4 @@
-import { mkdirSync, renameSync } from 'node:fs';
+import { mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -172,5 +172,40 @@ describe('gltf', () => {
 describe('vmdl_c', () => {
   it('explains how to get Source2Viewer-CLI when it is not configured', async () => {
     await expect(loadModel(path.join(dir, 'x.vmdl_c'), ctx())).rejects.toThrow(/Source2Viewer-CLI/);
+  });
+});
+
+describe('stl', () => {
+  const tri = [0, 0, 0, 1, 0, 0, 0, 1, 0];
+  const binarySTL = (header: string, tris: number[][]) => {
+    const b = Buffer.alloc(84 + tris.length * 50);
+    b.write(header, 0, 'latin1');
+    b.writeUInt32LE(tris.length, 80);
+    tris.forEach((t, i) => t.forEach((v, k) => b.writeFloatLE(v, 84 + i * 50 + 12 + k * 4)));
+    return b;
+  };
+  const write = (name: string, data: string | Buffer) => {
+    const p = path.join(dir, name);
+    writeFileSync(p, data);
+    return p;
+  };
+  const positions = async (p: string) => {
+    const m = mesh(await loadModel(p, ctx()));
+    expect(m.upAxis).toBe('Z');
+    return Array.from(m.meshes[0].positions);
+  };
+
+  it('reads ASCII STL', async () => {
+    const text = `solid t\n facet normal 0 0 1\n  outer loop\n   vertex 0 0 0\n   vertex 1 0 0\n   vertex 0 1 0\n  endloop\n endfacet\nendsolid t\n`;
+    expect(await positions(write('a.stl', text))).toEqual(tri);
+  });
+
+  it('reads binary STL, even when the header starts with "solid"', async () => {
+    expect(await positions(write('b.stl', binarySTL('binary', [tri, tri])))).toEqual([...tri, ...tri]);
+    expect(await positions(write('c.stl', binarySTL('solid exported by some CAD tool', [tri])))).toEqual(tri);
+  });
+
+  it('rejects files that are neither', async () => {
+    await expect(loadModel(write('d.stl', 'not a model'), ctx())).rejects.toThrow(/Not an STL/);
   });
 });

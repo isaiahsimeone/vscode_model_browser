@@ -23,11 +23,12 @@ Built for Source 2 modding, where the usual VS Code model viewers stop at glTF a
 |---|---|---|
 | glTF | `.glb`, `.gltf` | three.js. External textures and buffers next to the file are inlined |
 | Wavefront OBJ | `.obj` (+ `.mtl`) | three.js |
+| STL | `.stl` | Built-in reader for binary and ASCII STL (Z-up, one colour) |
 | Valve DMX | `.dmx` | Built-in reader for **binary (v1–9)** and **keyvalues2** encodings: meshes, materials, skeleton |
 | Source 2 model source | `.vmdl` | KV3 parser; loads every `RenderMeshFile` (`.dmx`) and merges them. Higher LODs and non-default body groups start hidden |
 | Source 2 compiled model | `.vmdl_c` | Converted to glTF by [Source 2 Viewer CLI](https://github.com/ValveResourceFormat/ValveResourceFormat) (textures, skeleton, animations), cached |
 
-Every format opens in the viewer. To edit a text format (`.vmdl`, `.obj`, `.gltf`, text `.dmx`), click **Text** in the viewer toolbar; the eye button in the text editor's title bar switches back.
+Every format opens in the viewer. To edit a text format (`.vmdl`, `.obj`, `.gltf`, ASCII `.stl`, text `.dmx`), click **Text** in the viewer toolbar; the eye button in the text editor's title bar switches back.
 
 ## The viewer
 
