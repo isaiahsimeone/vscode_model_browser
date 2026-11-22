@@ -1,6 +1,6 @@
 # Model Browser
 
-View 3D models inside VS Code. Open a model file and it shows up in a 3D viewer tab. The **Models** sidebar lists every model in the workspace, so you can click through them.
+View 3D models inside VS Code: **glTF/GLB, OBJ, STL**, and Source 2 **DMX, VMDL and VMDL_C**. Open a model file and it shows up in a 3D viewer tab. The **Models** sidebar lists every model in the workspace, so you can click through them.
 
 Built for Source 2 modding, where the usual VS Code model viewers stop at glTF and OBJ.
 
