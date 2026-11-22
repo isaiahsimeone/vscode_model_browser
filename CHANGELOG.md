@@ -3,6 +3,8 @@
 ## 0.2.0
 
 - STL support (binary and ASCII).
+- PLY support (ASCII and binary, vertex colours, point clouds).
+- The up-axis button's choice is remembered per file type.
 
 ## 0.1.1
 

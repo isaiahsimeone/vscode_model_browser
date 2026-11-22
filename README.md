@@ -1,6 +1,6 @@
 # Model Browser
 
-View 3D models inside VS Code: **glTF/GLB, OBJ, STL**, and Source 2 **DMX, VMDL and VMDL_C**. Open a model file and it shows up in a 3D viewer tab. The **Models** sidebar lists every model in the workspace, so you can click through them.
+View 3D models inside VS Code: **glTF/GLB, OBJ, STL, PLY**, and Source 2 **DMX, VMDL and VMDL_C**. Open a model file and it shows up in a 3D viewer tab. The **Models** sidebar lists every model in the workspace, so you can click through them.
 
 Built for Source 2 modding, where the usual VS Code model viewers stop at glTF and OBJ.
 
@@ -24,16 +24,17 @@ Built for Source 2 modding, where the usual VS Code model viewers stop at glTF a
 | glTF | `.glb`, `.gltf` | three.js. External textures and buffers next to the file are inlined |
 | Wavefront OBJ | `.obj` (+ `.mtl`) | three.js |
 | STL | `.stl` | Built-in reader for binary and ASCII STL (Z-up, one colour) |
+| PLY | `.ply` | three.js: ASCII and binary, vertex colours, normals. Files without faces show as point clouds |
 | Valve DMX | `.dmx` | Built-in reader for **binary (v1–9)** and **keyvalues2** encodings: meshes, materials, skeleton |
 | Source 2 model source | `.vmdl` | KV3 parser; loads every `RenderMeshFile` (`.dmx`) and merges them. Higher LODs and non-default body groups start hidden |
 | Source 2 compiled model | `.vmdl_c` | Converted to glTF by [Source 2 Viewer CLI](https://github.com/ValveResourceFormat/ValveResourceFormat) (textures, skeleton, animations), cached |
 
-Every format opens in the viewer. To edit a text format (`.vmdl`, `.obj`, `.gltf`, ASCII `.stl`, text `.dmx`), click **Text** in the viewer toolbar; the eye button in the text editor's title bar switches back.
+Every format opens in the viewer. To edit a text format (`.vmdl`, `.obj`, `.gltf`, ASCII `.stl`/`.ply`, text `.dmx`), click **Text** in the viewer toolbar; the eye button in the text editor's title bar switches back.
 
 ## The viewer
 
 - Orbit with left-drag, pan with right-drag or shift-drag, and zoom with the wheel. Double-click to frame the model.
-- Toolbar and keys: **F** frame, **W** wireframe, **B** bones, **G** grid, **U** swap Z-up / Y-up, **K** background, **P** side panel. **Text** reopens the file as text.
+- Toolbar and keys: **F** frame, **W** wireframe, **B** bones, **G** grid, **U** swap Z-up / Y-up (remembered per file type), **K** background, **P** side panel. **Text** reopens the file as text.
 - The side panel shows vertex, triangle, mesh, material and bone counts and the model's size. You can toggle parts on and off, see the material list, and play any animations the file contains. Notes explain anything that couldn't be loaded.
 - `.dmx` and `.vmdl` don't carry textures, so each material gets its own stable colour.
 - The viewer reloads when the file changes on disk.

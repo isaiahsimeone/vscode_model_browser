@@ -63,4 +63,5 @@ export interface Notes {
 export type ModelData =
   | ({ kind: 'gltf'; bytes: Uint8Array; upAxis?: 'Y' | 'Z' } & Notes)
   | ({ kind: 'obj'; text: string; mtl?: string } & Notes)
+  | ({ kind: 'ply'; bytes: Uint8Array; pointCloud: boolean } & Notes)
   | ({ kind: 'mesh'; meshes: MeshPart[]; skeleton?: Bone[]; upAxis: 'Y' | 'Z' } & Notes);

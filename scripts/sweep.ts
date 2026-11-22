@@ -51,7 +51,7 @@ const stats = new Map<string, Row>();
       if (m.kind === 'mesh') {
         tris = m.meshes.reduce((n, p) => n + p.indices.length / 3, 0);
         empty = tris === 0 && !m.skeleton;
-      } else if (m.kind === 'gltf') empty = m.bytes.length < 100;
+      } else if (m.kind === 'gltf' || m.kind === 'ply') empty = m.bytes.length < 100;
       else empty = !/^f\s/m.test(m.text);
       row.tris += tris;
       if (empty) row.empty++;

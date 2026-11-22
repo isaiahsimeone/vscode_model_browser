@@ -11,7 +11,7 @@ export const VIEW_TYPE = 'modelBrowser.viewer';
 /** Messages sent to the webview. */
 export type ToWebview =
   | { type: 'loading'; file: string }
-  | { type: 'model'; file: string; loader: string; data: ModelData; ms: number }
+  | { type: 'model'; file: string; loader: string; data: ModelData; ms: number; upAxis?: 'Y' | 'Z' }
   | { type: 'error'; file: string; message: string; action?: 'configureS2V' };
 
 /** Messages received from the webview. */
@@ -21,7 +21,11 @@ export type FromWebview =
   | { type: 'openAsText' }
   | { type: 'revealInExplorer' }
   | { type: 'configureS2V' }
-  | { type: 'state'; state: unknown };
+  | { type: 'state'; state: unknown }
+  | { type: 'setUpAxis'; axis: 'Y' | 'Z' };
+
+/** The up-axis button's choice is remembered per file extension: formats like PLY have no convention. */
+const upAxisKey = (file: string) => `upAxis${path.extname(file).toLowerCase()}`;
 
 class ModelDocument implements vscode.CustomDocument {
   constructor(public readonly uri: vscode.Uri) {}
@@ -71,7 +75,8 @@ export class ModelEditorProvider implements vscode.CustomReadonlyEditorProvider<
               )
             : await run();
         if (ac.signal.aborted) return;
-        post({ type: 'model', file: path.basename(file), loader: loader?.label ?? '?', data, ms: Date.now() - t0 });
+        const upAxis = this.context.globalState.get<'Y' | 'Z'>(upAxisKey(file));
+        post({ type: 'model', file: path.basename(file), loader: loader?.label ?? '?', data, ms: Date.now() - t0, upAxis });
       } catch (e) {
         if (ac.signal.aborted) return;
         const err = e as Error;
@@ -106,6 +111,8 @@ export class ModelEditorProvider implements vscode.CustomReadonlyEditorProvider<
           return vscode.commands.executeCommand('vscode.openWith', doc.uri, 'default');
         case 'revealInExplorer':
           return vscode.commands.executeCommand('revealInExplorer', doc.uri);
+        case 'setUpAxis':
+          return this.context.globalState.update(upAxisKey(file), m.axis);
         case 'configureS2V':
           return vscode.commands.executeCommand('workbench.action.openSettings', 'modelBrowser.s2vPath');
       }

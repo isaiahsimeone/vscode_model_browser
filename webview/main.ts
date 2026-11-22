@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { FromWebview, ToWebview } from '../src/editor/ModelEditorProvider';
 import type { ModelData, MeshPart, Bone } from '../src/loaders/types';
@@ -245,6 +246,26 @@ async function buildGltf(bytes: Uint8Array): Promise<{ root: THREE.Object3D; cli
   return { root: gltf.scene, clips: gltf.animations };
 }
 
+function buildPly(bytes: Uint8Array, pointCloud: boolean, name: string): THREE.Object3D {
+  const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  const geometry = new PLYLoader().parse(buf);
+  const vertexColors = geometry.hasAttribute('color');
+  const color = vertexColors ? new THREE.Color(1, 1, 1) : materialColor(name);
+  const matName = vertexColors ? 'vertex colours' : 'ply';
+  if (pointCloud || !geometry.index) {
+    const points = new THREE.Points(geometry, new THREE.PointsMaterial({ size: 2, sizeAttenuation: false, vertexColors, color, name: matName }));
+    points.name = name;
+    return points;
+  }
+  if (!geometry.hasAttribute('normal')) geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(
+    geometry,
+    new THREE.MeshStandardMaterial({ vertexColors, color, roughness: 0.75, metalness: 0.05, side: THREE.DoubleSide, name: matName }),
+  );
+  mesh.name = name;
+  return mesh;
+}
+
 function buildObj(text: string, mtl?: string): THREE.Object3D {
   const loader = new OBJLoader();
   if (mtl) {
@@ -304,7 +325,7 @@ function bounds(): THREE.Box3 {
   modelRoot.updateMatrixWorld(true);
   if (content) {
     content.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh && o.visible) box.expandByObject(o);
+      if (((o as THREE.Mesh).isMesh || (o as THREE.Points).isPoints) && o.visible) box.expandByObject(o);
     });
   }
   if (box.isEmpty() && skeletonObj) box.expandByObject(skeletonObj);
@@ -362,6 +383,11 @@ function fillPanel(data: ModelData, loader: string, ms: number) {
   const mats = new Map<string, THREE.Color | null>();
   content?.traverse((o) => {
     const m = o as THREE.Mesh;
+    if ((o as THREE.Points).isPoints) {
+      verts += m.geometry.getAttribute('position')?.count ?? 0;
+      const mat = m.material as THREE.PointsMaterial;
+      mats.set(mat.name || '(unnamed)', mat.vertexColors ? null : mat.color);
+    }
     if (m.isMesh) {
       meshes++;
       const pos = m.geometry.getAttribute('position');
@@ -369,7 +395,7 @@ function fillPanel(data: ModelData, loader: string, ms: number) {
       tris += (m.geometry.index ? m.geometry.index.count : pos?.count ?? 0) / 3;
       for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
         const c = (mat as THREE.MeshStandardMaterial).color;
-        mats.set(mat.name || '(unnamed)', (mat as THREE.MeshStandardMaterial).map ? null : c ?? null);
+        mats.set(mat.name || '(unnamed)', (mat as THREE.MeshStandardMaterial).map || mat.vertexColors ? null : c ?? null);
       }
     }
     if ((o as THREE.Bone).isBone) bones++;
@@ -479,6 +505,8 @@ async function showModel(msg: Extract<ToWebview, { type: 'model' }>) {
         helper.renderOrder = 10;
         skeletonObj = helper;
       }
+    } else if (data.kind === 'ply') {
+      content = buildPly(data.bytes, data.pointCloud, msg.file.replace(/\.ply$/i, ''));
     } else {
       content = buildObj(data.text, data.mtl);
     }
@@ -496,7 +524,7 @@ async function showModel(msg: Extract<ToWebview, { type: 'model' }>) {
   applyWireframe();
   $('name').textContent = msg.file;
   document.title = msg.file;
-  setUp(data.kind === 'mesh' ? data.upAxis : data.kind === 'gltf' ? data.upAxis ?? 'Y' : 'Y');
+  setUp(msg.upAxis ?? (data.kind === 'mesh' ? data.upAxis : data.kind === 'gltf' ? data.upAxis ?? 'Y' : 'Y'));
   fillPanel(data, msg.loader, msg.ms);
   // Keep the camera when the same file reloads (e.g. rebuilt on disk); frame on first show.
   if (firstModel) frame();
@@ -546,6 +574,7 @@ const actions: Record<string, () => void> = {
   },
   up: () => {
     setUp(upAxis === 'Z' ? 'Y' : 'Z');
+    send({ type: 'setUpAxis', axis: upAxis });
     frame();
   },
   bg: () => {

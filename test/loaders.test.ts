@@ -209,3 +209,48 @@ describe('stl', () => {
     await expect(loadModel(write('d.stl', 'not a model'), ctx())).rejects.toThrow(/Not an STL/);
   });
 });
+
+describe('ply', () => {
+  const asciiCloud = 'ply\nformat ascii 1.0\nelement vertex 3\nproperty float x\nproperty float y\nproperty float z\nproperty uchar red\nproperty uchar green\nproperty uchar blue\nend_header\n0 0 0 255 0 0\n1 0 0 0 255 0\n0 1 0 0 0 255\n';
+  const binaryMesh = () => {
+    const header = Buffer.from('ply\nformat binary_little_endian 1.0\nelement vertex 3\nproperty float x\nproperty float y\nproperty float z\nelement face 1\nproperty list uchar int vertex_indices\nproperty ushort extra\nend_header\n', 'latin1');
+    const body = Buffer.alloc(36 + 1 + 12 + 2);
+    [0, 0, 0, 1, 0, 0, 0, 1, 0].forEach((v, i) => body.writeFloatLE(v, i * 4));
+    body.writeUInt8(3, 36);
+    [0, 1, 2].forEach((v, i) => body.writeInt32LE(v, 37 + i * 4));
+    return Buffer.concat([header, body]);
+  };
+  const write = (name: string, data: string | Buffer) => {
+    const p = path.join(dir, name);
+    writeFileSync(p, data);
+    return p;
+  };
+  // The webview parses with three's PLYLoader; run it here too so format support is tested end to end.
+  const parse = async (bytes: Uint8Array) => {
+    const { PLYLoader } = await import('three/examples/jsm/loaders/PLYLoader.js');
+    return new PLYLoader().parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
+  };
+
+  it('flags ASCII files without faces as point clouds, with vertex colours', async () => {
+    const m = await loadModel(write('cloud.ply', asciiCloud), ctx());
+    if (m.kind !== 'ply') throw new Error('expected ply');
+    expect(m.pointCloud).toBe(true);
+    expect(m.notes).toContain('Has vertex colours.');
+    const g = await parse(m.bytes);
+    expect(g.getAttribute('position').count).toBe(3);
+    expect(g.hasAttribute('color')).toBe(true);
+    expect(g.index).toBeNull();
+  });
+
+  it('reads binary meshes with extra face properties', async () => {
+    const m = await loadModel(write('tri.ply', binaryMesh()), ctx());
+    if (m.kind !== 'ply') throw new Error('expected ply');
+    expect(m.pointCloud).toBe(false);
+    const g = await parse(m.bytes);
+    expect(Array.from(g.index!.array)).toEqual([0, 1, 2]);
+  });
+
+  it('rejects files that are not PLY', async () => {
+    await expect(loadModel(write('bad.ply', 'hello'), ctx())).rejects.toThrow(/Not a PLY/);
+  });
+});
